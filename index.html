@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jerk Park</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #050609;
+    color: white;
+    font-family: "Times New Roman", Times, serif;
+    overflow-x: hidden;
+}
+
+button {
+    font-family: "Times New Roman", Times, serif !important;
+    font-size: 22px;
+    color: white;
+    background: #080808;
+    border: 2px solid #aaa;
+    border-radius: 0;
+    padding: 14px 25px;
+    cursor: pointer;
+    transition: transform 0.6s ease-in-out,
+                background-color 0.6s ease-in-out,
+                border-color 0.6s ease-in-out;
+}
+
+button:hover {
+    transform: scale(1.08);
+    background: #40130f;
+    border-color: #c18b49;
+}
+
+button:focus-visible {
+    outline: 3px solid #d9a45c;
+    outline-offset: 4px;
+}
+
+.screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 25px;
+    position: relative;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse at 75% 30%, #292c35 0%, transparent 35%),
+        linear-gradient(#11131c, #08090d 70%, #020203);
+}
+
+.screen::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+        radial-gradient(#ffffff33 1px, transparent 1px);
+    background-size: 70px 70px;
+    opacity: 0.2;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* MAIN MENU */
+
+#mainMenu {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-left: 9%;
+}
+
+.title {
+    position: relative;
+    z-index: 1;
+    font-size: clamp(65px, 12vw, 125px);
+    line-height: 0.85;
+    text-transform: uppercase;
+    margin: 0 0 40px;
+    color: #b94d35;
+    text-shadow: 5px 5px #32120e, 0 0 30px #65251b;
+}
+
+.title span {
+    display: block;
+    color: #d4a14c;
+}
+
+.subtitle {
+    position: relative;
+    z-index: 1;
+    color: #aaa;
+    letter-spacing: 4px;
+    margin-bottom: 25px;
+}
+
+.menu-buttons {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 17px;
+    width: 250px;
+}
+
+.menu-buttons button {
+    width: 100%;
+}
+
+/* CSS MASCOT */
+
+.mascot {
+    position: absolute;
+    z-index: 0;
+    right: 7%;
+    bottom: -25px;
+    width: 300px;
+    height: 410px;
+    animation: breathing 4s ease-in-out infinite;
+}
+
+.mascot-head {
+    position: absolute;
+    z-index: 2;
+    top: 65px;
+    left: 35px;
+    width: 225px;
+    height: 220px;
+    border-radius: 45% 45% 38% 38%;
+    border: 5px solid #211b16;
+    background: radial-gradient(circle at 35% 25%, #a08b57, #5c482a 70%);
+    transform: rotate(-5deg);
+}
+
+.ear {
+    position: absolute;
+    top: -20px;
+    width: 80px;
+    height: 90px;
+    border-radius: 50%;
+    border: 7px solid #211b16;
+    background: #66502e;
+    z-index: -1;
+}
+
+.ear.left { left: -28px; }
+.ear.right { right: -28px; }
+
+.eye {
+    position: absolute;
+    top: 65px;
+    width: 50px;
+    height: 65px;
+    border-radius: 50%;
+    background: black;
+}
+
+.eye.left { left: 35px; }
+.eye.right { right: 35px; }
+
+.eye::after {
+    content: "";
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 0 10px white;
+}
+
+.mouth {
+    position: absolute;
+    left: 35px;
+    bottom: 22px;
+    width: 150px;
+    height: 55px;
+    overflow: hidden;
+    border: 4px solid #24100c;
+    border-radius: 15% 15% 50% 50%;
+    background: #100605;
+}
+
+.teeth {
+    height: 14px;
+    background: repeating-linear-gradient(
+        90deg,
+        #d7c9a7 0px,
+        #d7c9a7 15px,
+        #38291f 15px,
+        #38291f 19px
+    );
+}
+
+.hat {
+    position: absolute;
+    z-index: 3;
+    top: 5px;
+    left: 105px;
+    width: 125px;
+    height: 90px;
+    background: #111116;
+    border: 4px solid #29232a;
+    transform: rotate(-6deg);
+}
+
+.hat::before {
+    content: "";
+    position: absolute;
+    left: -22px;
+    bottom: -8px;
+    width: 160px;
+    height: 14px;
+    background: #171419;
+    border: 3px solid #29232a;
+}
+
+.hat::after {
+    content: "";
+    position: absolute;
+    bottom: 15px;
+    width: 100%;
+    height: 14px;
+    background: #78201c;
+}
+
+.mascot-body {
+    position: absolute;
+    top: 270px;
+    left: 50px;
+    width: 195px;
+    height: 180px;
+    border: 5px solid #171419;
+    border-radius: 40% 40% 0 0;
+    background: linear-gradient(90deg, #14151b, #38313a, #101116);
+}
+
+.bowtie {
+    position: absolute;
+    z-index: 4;
+    top: 285px;
+    left: 110px;
+    width: 75px;
+    height: 38px;
+    background: #861d20;
+    clip-path: polygon(0 0, 50% 25%, 100% 0, 85% 100%, 50% 75%, 15% 100%);
+}
+
+@keyframes breathing {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+/* LOADING SCREEN */
+
+#loadingScreen {
+    flex-direction: column;
+    text-align: center;
+    gap: 20px;
+}
+
+.loading-title {
+    color: #c18b49;
+    font-size: 42px;
+}
+
+.loading-track {
+    width: min(420px, 85vw);
+    height: 25px;
+    border: 2px solid #aaa;
+    background: #080808;
+    padding: 3px;
+}
+
+#loadingBar {
+    width: 0%;
+    height: 100%;
+    background: #a53a2b;
+    transition: width 0.1s linear;
+}
+
+#loadingPercent {
+    color: #aaa;
+    font-size: 20px;
+}
+
+/* STORY SCREEN */
+
+#storyScreen {
+    flex-direction: column;
+    text-align: center;
+}
+
+.story-panel {
+    position: relative;
+    z-index: 1;
+    width: min(750px, 100%);
+    padding: 30px;
+    border: 2px solid #51413b;
+    background: #08090bee;
+    box-shadow: 0 0 40px #000;
+}
+
+.story-label {
+    color: #b94d35;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+
+#storyTitle {
+    color: #d4a14c;
+    font-size: clamp(32px, 6vw, 48px);
+    margin: 15px 0;
+}
+
+#storyText {
+    color: #ddd;
+    font-size: 23px;
+    line-height: 1.6;
+    white-space: pre-line;
+}
+
+#choices {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+#choices button {
+    flex: 1 1 200px;
+    max-width: 300px;
+}
+
+#storyStatus {
+    margin-top: 20px;
+    color: #aaa;
+    font-size: 16px;
+}
+
+/* SETTINGS */
+
+.settings-panel {
+    position: relative;
+    z-index: 5;
+    width: min(400px, 100%);
+    padding: 30px;
+    background: #080808;
+    border: 2px solid #b18a56;
+    text-align: center;
+}
+
+.settings-panel h2 {
+    font-size: 36px;
+    color: #d4a14c;
+}
+
+.settings-panel label {
+    display: block;
+    margin: 22px 0;
+    font-size: 21px;
+}
+
+.settings-panel button {
+    width: 100%;
+}
+
+@media (max-width: 650px) {
+    #mainMenu {
+        padding-left: 6%;
+    }
+
+    .mascot {
+        right: -150px;
+        opacity: 0.35;
+    }
+
+    .menu-buttons {
+        width: min(240px, 85%);
+    }
+
+    .story-panel {
+        padding: 20px;
+    }
+
+    #storyText {
+        font-size: 20px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- MAIN MENU -->
+
+<section id="mainMenu" class="screen">
+    <h1 class="title">
+        <span>Jerk</span>
+        Park
+    </h1>
+
+    <div class="subtitle">THE PARK IS WAITING FOR YOU</div>
+
+    <div class="menu-buttons">
+        <button id="playButton">Play</button>
+        <button id="settingsButton">Settings</button>
+    </div>
+
+    <div class="mascot" aria-hidden="true">
+        <div class="hat"></div>
+
+        <div class="mascot-head">
+            <div class="ear left"></div>
+            <div class="ear right"></div>
+            <div class="eye left"></div>
+            <div class="eye right"></div>
+            <div class="mouth">
+                <div class="teeth"></div>
+            </div>
+        </div>
+
+        <div class="mascot-body"></div>
+        <div class="bowtie"></div>
+    </div>
+</section>
+
+<!-- LOADING SCREEN -->
+
+<section id="loadingScreen" class="screen hidden">
+    <div class="loading-title">JERK PARK</div>
+
+    <p id="loadingMessage">Preparing your visit...</p>
+
+    <div class="loading-track">
+        <div id="loadingBar"></div>
+    </div>
+
+    <div id="loadingPercent">0%</div>
+</section>
+
+<!-- STORY SCREEN -->
+
+<section id="storyScreen" class="screen hidden">
+    <div class="story-panel">
+        <div class="story-label">Jerk Park — Interactive Horror</div>
+
+        <h2 id="storyTitle"></h2>
+
+        <p id="storyText"></p>
+
+        <div id="choices"></div>
+
+        <div id="storyStatus"></div>
+    </div>
+</section>
+
+<!-- SETTINGS SCREEN -->
+
+<section id="settingsScreen" class="screen hidden">
+    <div class="settings-panel">
+        <h2>Settings</h2>
+
+        <label>
+            <input type="checkbox" id="musicToggle" checked>
+            Music Enabled
+        </label>
+
+        <label>
+            <input type="checkbox" id="effectsToggle" checked>
+            Sound Effects Enabled
+        </label>
+
+        <button id="closeSettings">Back</button>
+    </div>
+</section>
+
+<script>
+const mainMenu = document.getElementById("mainMenu");
+const loadingScreen = document.getElementById("loadingScreen");
+const storyScreen = document.getElementById("storyScreen");
+const settingsScreen = document.getElementById("settingsScreen");
+
+const loadingBar = document.getElementById("loadingBar");
+const loadingPercent = document.getElementById("loadingPercent");
+const loadingMessage = document.getElementById("loadingMessage");
+
+const storyTitle = document.getElementById("storyTitle");
+const storyText = document.getElementById("storyText");
+const choices = document.getElementById("choices");
+const storyStatus = document.getElementById("storyStatus");
+
+let loadingTimer = null;
+let storyStarted = false;
+
+function showScreen(screen) {
+    [mainMenu, loadingScreen, storyScreen, settingsScreen]
+        .forEach(element => element.classList.add("hidden"));
+
+    screen.classList.remove("hidden");
+}
+
+/* PLAY AND LOADING */
+
+document.getElementById("playButton").addEventListener("click", startLoading);
+
+function startLoading() {
+    if (loadingTimer !== null) {
+        clearInterval(loadingTimer);
+    }
+
+    showScreen(loadingScreen);
+
+    let progress = 0;
+    loadingBar.style.width = "0%";
+    loadingPercent.textContent = "0%";
+    loadingMessage.textContent = "Preparing your visit...";
+
+    loadingTimer = setInterval(function() {
+        progress += 1;
+
+        loadingBar.style.width = progress + "%";
+        loadingPercent.textContent = progress + "%";
+
+        if (progress === 30) {
+            loadingMessage.textContent = "Opening the park gates...";
+        }
+
+        if (progress === 65) {
+            loadingMessage.textContent = "Checking the attractions...";
+        }
+
+        if (progress >= 100) {
+            clearInterval(loadingTimer);
+            loadingTimer = null;
+
+            setTimeout(function() {
+                startStory();
+            }, 500);
+        }
+    }, 35);
+}
+
+/* STORY SYSTEM */
+
+const story = {
+    entrance: {
+        title: "THE ENTRANCE",
+        text: "It's 11:47 PM.\n\nYou stand outside Jerk Park, an abandoned amusement park that supposedly closed years ago.\n\nSuddenly, the entrance gate creaks open by itself.\n\nA sign reads: \"EMPLOYEES MUST CHECK IN BEFORE ENTERING.\"",
+        status: "CHAPTER 1 — THE VISITOR",
+        choices: [
+            {
+                text: "Enter through the gate",
+                next: "ticketBooth"
+            },
+            {
+                text: "Climb over the fence",
+                next: "caught"
+            },
+            {
+                text: "Leave immediately",
+                next: "escape"
+            }
+        ]
+    },
+
+    ticketBooth: {
+        title: "THE TICKET BOOTH",
+        text: "You enter the park.\n\nA dusty ticket booth sits beside the entrance. Inside, an old telephone rings.\n\nA cheerful voice answers the call before you touch it.\n\n\"WELCOME, VISITOR! PLEASE COLLECT YOUR EMPLOYEE BADGE.\"",
+        status: "CHAPTER 1 — THE VISITOR",
+        choices: [
+            {
+                text: "Take the employee badge",
+                next: "badge"
+            },
+            {
+                text: "Answer the telephone",
+                next: "telephone"
+            },
+            {
+                text: "Run toward the rides",
+                next: "mascotEncounter"
+            }
+        ]
+    },
+
+    badge: {
+        title: "EMPLOYEE OF THE MONTH",
+        text: "You pick up the badge.\n\nIt has your name on it.\n\nThat's impossible. You never told anyone your name.\n\nA speaker crackles overhead:\n\n\"OUR NEW EMPLOYEE HAS ARRIVED! JERK WOULD LIKE TO MEET YOU.\"",
+        status: "A NEW CLUE HAS BEEN FOUND",
+        choices: [
+            {
+                text: "Follow the speaker's directions",
+                next: "mascotEncounter"
+            },
+            {
+                text: "Hide the badge and search the booth",
+                next: "hiddenRoom"
+            }
+        ]
+    },
+
+    telephone: {
+        title: "THE CALL",
+        text: "\"OH, GOOD! YOU ANSWERED!\" the voice says.\n\n\"YOUR FIRST SHIFT STARTS NOW. DON'T LOOK BEHIND YOU.\"\n\nYou hear heavy footsteps approaching from behind the booth.",
+        status: "SOMETHING IS APPROACHING",
+        choices: [
+            {
+                text: "Turn around",
+                next: "caught"
+            },
+            {
+                text: "Hide beneath the counter",
+                next: "hiddenRoom"
+            },
+            {
+                text: "Run toward the carousel",
+                next: "mascotEncounter"
+            }
+        ]
+    },
+
+    hiddenRoom: {
+        title: "THE HIDDEN ROOM",
+        text: "Behind a loose panel, you discover a small maintenance room.\n\nThere are security monitors, a rusty key, and a handwritten note:\n\n\"JERK CAN ONLY ENTER WHERE HE IS INVITED. NEVER SAY HIS NAME THREE TIMES.\"\n\nYou hear the booth door creak open.",
+        status: "ITEM FOUND: RUSTY KEY",
+        choices: [
+            {
+                text: "Take the key and escape through the back",
+                next: "maintenancePath"
+            },
+            {
+                text: "Stay hidden",
+                next: "caught"
+            }
+        ]
+    },
+
+    maintenancePath: {
+        title: "THE MAINTENANCE TUNNEL",
+        text: "You unlock a metal door with the rusty key.\n\nA dark tunnel stretches beneath the park. At the end, you see two doors.\n\nOne is marked STAFF ONLY.\nThe other is marked MASCOT STORAGE.",
+        status: "CHAPTER 2 — BELOW THE PARK",
+        choices: [
+            {
+                text: "Enter STAFF ONLY",
+                next: "staffRoom"
+            },
+            {
+                text: "Enter MASCOT STORAGE",
+                next: "mascotEncounter"
+            }
+        ]
+    },
+
+    staffRoom: {
+        title: "THE STAFF ROOM",
+        text: "The room is filled with old uniforms and photographs.\n\nIn every photograph, a mascot stands behind the employees.\n\nIn the newest photograph, the mascot is standing behind YOU.\n\nA door slams shut.",
+        status: "CHAPTER 2 — BELOW THE PARK",
+        choices: [
+            {
+                text: "Search the lockers",
+                next: "secretEnding"
+            },
+            {
+                text: "Try to force the door open",
+                next: "caught"
+            }
+        ]
+    },
+
+    mascotEncounter: {
+        title: "MEET JERK",
+        text: "A spotlight flickers on.\n\nStanding in the middle of the carousel is Jerk, the park's old mascot.\n\nHe wears a cracked top hat and a permanent smile.\n\n\"THERE YOU ARE!\" he says.\n\n\"WOULD YOU LIKE TO PLAY A GAME?\"",
+        status: "CHAPTER 2 — THE MASCOT",
+        choices: [
+            {
+                text: "Play along",
+                next: "gameRoom"
+            },
+            {
+                text: "Pretend to be an employee",
+                next: "badge"
+            },
+            {
+                text: "Run away",
+                next: "caught"
+            }
+        ]
+    },
+
+    gameRoom: {
+        title: "THE GAME ROOM",
+        text: "Jerk leads you into an arcade filled with broken machines.\n\nHe points at three doors.\n\n\"ONE DOOR LEADS TO FREEDOM. ONE LEADS TO MY OFFICE. ONE LEADS TO A VERY BAD DAY!\"\n\nHe giggles.\n\nWhich door will you choose?",
+        status: "CHAPTER 3 — MAKE YOUR CHOICE",
+        choices: [
+            {
+                text: "The red door",
+                next: "caught"
+            },
+            {
+                text: "The blue door",
+                next: "secretEnding"
+            },
+            {
+                text: "The yellow door",
+                next: "escape"
+            }
+        ]
+    },
+
+    caught: {
+        title: "GAME OVER",
+        text: "A loud laugh echoes through the park.\n\n\"WRONG CHOICE!\" Jerk announces.\n\nThe screen goes dark.\n\nMaybe next time, you'll make a better decision.",
+        status: "ENDING 1 — CAUGHT BY JERK",
+        ending: true,
+        choices: [
+            {
+                text: "Try Again",
+                next: "entrance"
+            },
+            {
+                text: "Return to Main Menu",
+                next: "menu"
+            }
+        ]
+    },
+
+    escape: {
+        title: "YOU ESCAPED...?",
+        text: "You sprint toward the exit.\n\nYou reach the road, exhausted. The park is finally behind you.\n\nThen your phone rings.\n\nThe caller ID reads:\n\nJERK PARK.\n\n\"THANKS FOR VISITING! COME BACK SOON!\"",
+        status: "ENDING 2 — THE VISITOR",
+        ending: true,
+        choices: [
+            {
+                text: "Try Again",
+                next: "entrance"
+            },
+            {
+                text: "Return to Main Menu",
+                next: "menu"
+            }
+        ]
+    },
+
+    secretEnding: {
+        title: "THE REAL OWNER",
+        text: "Inside the locker is an old security tape.\n\nIt shows the park's owner removing Jerk's mascot head.\n\nThere is nobody underneath.\n\nThe tape suddenly switches to a live camera feed.\n\nJerk is standing directly behind you.\n\n\"YOU FOUND MY SECRET!\"",
+        status: "SECRET ENDING — THE EMPTY SUIT",
+        ending: true,
+        choices: [
+            {
+                text: "Try Again",
+                next: "entrance"
+            },
+            {
+                text: "Return to Main Menu",
+                next: "menu"
+            }
+        ]
+    }
+};
+
+function startStory() {
+    storyStarted = true;
+    showScene("entrance");
+}
+
+function showScene(sceneName) {
+    if (sceneName === "menu") {
+        storyStarted = false;
+        showScreen(mainMenu);
+        return;
+    }
+
+    const scene = story[sceneName];
+
+    if (!scene) {
+        return;
+    }
+
+    showScreen(storyScreen);
+
+    storyTitle.textContent = scene.title;
+    storyText.textContent = scene.text;
+    storyStatus.textContent = scene.status;
+
+    choices.replaceChildren();
+
+    scene.choices.forEach(function(choice) {
+        const button = document.createElement("button");
+
+        button.textContent = choice.text;
+
+        button.addEventListener("click", function() {
+            showScene(choice.next);
+        });
+
+        choices.appendChild(button);
+    });
+}
+
+/* SETTINGS */
+
+document.getElementById("settingsButton").addEventListener("click", function() {
+    showScreen(settingsScreen);
+});
+
+document.getElementById("closeSettings").addEventListener("click", function() {
+    showScreen(mainMenu);
+});
+
+/* Sound toggles are placeholders until audio is added. */
+
+document.getElementById("musicToggle").addEventListener("change", function() {
+    console.log("Music enabled:", this.checked);
+});
+
+document.getElementById("effectsToggle").addEventListener("change", function() {
+    console.log("Sound effects enabled:", this.checked);
+});
+</script>
+
+</body>
+</html>
